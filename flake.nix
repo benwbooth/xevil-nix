@@ -39,6 +39,20 @@
           nativeBuildInputs = [
             pkgs.pkg-config
             pkgs.makeWrapper
+            pkgs.imagemagick
+            pkgs.copyDesktopItems
+          ];
+
+          desktopItems = [
+            (pkgs.makeDesktopItem {
+              name = "xevil";
+              exec = "xevil";
+              icon = "xevil";
+              desktopName = "XEvil";
+              comment = "A side-view, fast-action, kill-everything game";
+              categories = [ "Game" "ActionGame" ];
+              keywords = [ "game" "action" "multiplayer" ];
+            })
           ];
 
           buildInputs = [
@@ -77,6 +91,13 @@
             cp -r instructions/* $out/share/doc/xevil/
             install -Dm644 compiling.html $out/share/doc/xevil/
             install -Dm644 readme.txt $out/share/doc/xevil/
+
+            # Convert XPM icon to PNG and install at various sizes
+            for size in 16 32 48 64 128; do
+              mkdir -p $out/share/icons/hicolor/''${size}x''${size}/apps
+              convert x11/bitmaps/ui/xevil_icon.xpm -resize ''${size}x''${size} \
+                $out/share/icons/hicolor/''${size}x''${size}/apps/xevil.png
+            done
 
             runHook postInstall
           '';
