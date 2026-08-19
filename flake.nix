@@ -13,16 +13,16 @@
 
         # Create a merged font directory with both fonts and aliases
         xevilFonts = pkgs.runCommand "xevil-fonts" {
-          nativeBuildInputs = [ pkgs.xorg.mkfontscale ];
+          nativeBuildInputs = [ pkgs.mkfontscale ];
         } ''
           mkdir -p $out/share/fonts/X11/misc
           # Copy all font files
-          cp ${pkgs.xorg.fontmiscmisc}/share/fonts/X11/misc/*.pcf.gz $out/share/fonts/X11/misc/
+          cp ${pkgs.font-misc-misc}/share/fonts/X11/misc/*.pcf.gz $out/share/fonts/X11/misc/
           # Copy font aliases
-          cp ${pkgs.xorg.fontalias}/share/fonts/X11/misc/fonts.alias $out/share/fonts/X11/misc/
+          cp ${pkgs.font-alias}/share/fonts/X11/misc/fonts.alias $out/share/fonts/X11/misc/
           # Regenerate fonts.dir with mkfontdir
           cd $out/share/fonts/X11/misc
-          ${pkgs.xorg.mkfontscale}/bin/mkfontdir
+          ${pkgs.mkfontscale}/bin/mkfontdir
         '';
 
         xevil = pkgs.stdenv.mkDerivation rec {
@@ -56,13 +56,13 @@
           ];
 
           buildInputs = [
-            pkgs.xorg.libX11
-            pkgs.xorg.libXpm
+            pkgs.libx11
+            pkgs.libxpm
           ];
 
           # The game requires the 9x15 bitmap font at runtime
           propagatedBuildInputs = [
-            pkgs.xorg.fontmiscmisc
+            pkgs.font-misc-misc
           ];
 
           makeFlags = [
@@ -107,8 +107,8 @@
             fontPath = "${xevilFonts}/share/fonts/X11/misc";
           in ''
             makeWrapper $out/bin/.xevil-unwrapped $out/bin/xevil \
-              --run "${pkgs.xorg.xset}/bin/xset +fp ${fontPath} 2>/dev/null || true" \
-              --run "${pkgs.xorg.xset}/bin/xset fp rehash 2>/dev/null || true" \
+              --run "${pkgs.xset}/bin/xset +fp ${fontPath} 2>/dev/null || true" \
+              --run "${pkgs.xset}/bin/xset fp rehash 2>/dev/null || true" \
               --prefix PATH : "${pkgs.coreutils}/bin"
           '';
 
